@@ -11,6 +11,10 @@ services:
     volumes:
       - ./services/npm/data/app:/data
       - ./services/npm/data/letsencrypt:/etc/letsencrypt
+    networks:
+      wg:
+        ipv4_address: 10.42.42.41
+        ipv6_address: fdcc:ad94:bacf:61a3::29
   wg-easy:
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
