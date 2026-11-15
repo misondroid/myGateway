@@ -1,0 +1,43 @@
+- name: update apt repositories
+  apt:
+    update_cache: true
+
+- name: install desktop environment
+  apt:
+    name: "{{ packages.desktop + packages.xrdp }}"
+    state: present
+
+- name: check whether desktop environment is installed
+  command: dpkg-query -W -f '${Status}' xfce4
+  register: desktop_status
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: launch xfce from xrdp
+  when: desktop_status.changed and xfce4_status.stdout == 'install ok installed'
+  lineinfile:
+    path: /etc/xrdp/startwm.sh
+    insertbefore: '^test -x /etc/X11/Xsession'
+    line: exec startxfce4    
+
+- name: setup japanese environment in xfce
+  when: desktop_status.changed and xfce4_status.stdout == 'install ok installed'
+  lineinfile:
+    path: /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+    insertbefore: '^test -x /etc/X11/Xsession'
+    line: exec startxfce4
+
+- name: setup japanese environment in xrdp
+  when: desktop_status.changed and xfce4_status.stdout == 'install ok installed'
+  lineinfile:
+    path: /etc/xrdp/startwm.sh
+    insertbefore: '^test -x /etc/X11/Xsession'
+    line: exec startxfce4
+
+- name: enable xrdp
+  when: desktop_status.changed and xfce4_status.stdout == 'install ok installed'
+  systemd:
+    name: xrdp
+    enabled: true
+    state: started

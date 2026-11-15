@@ -1,0 +1,75 @@
+- name: resolve ssh destination
+  ansible.builtin.command:
+    argv:
+      - ssh
+      - -G
+      - "{{ ansible_host }}"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  register: ssh_effective_config
+
+- name: record ssh destination
+  ansible.builtin.set_fact:
+    ssh_hostname: "{{ ssh_hostname }}"
+    ssh_port: "{{ ssh_port }}"
+    ssh_known_hosts_name: "{{ ('[' + ssh_hostname + ']:' + ssh_port) if (ssh_port | int != 22) else ssh_hostname }}"
+  vars:
+    ssh_hostname: "{{ ssh_effective_config.stdout_lines | select('match', '^hostname ') | map('split') | map('last') | first }}"
+    ssh_port: "{{ ssh_effective_config.stdout_lines | select('match', '^port ') | map('split') | map('last') | first }}"
+  delegate_to: localhost
+
+- name: read current host keys
+  ansible.builtin.command:
+    argv:
+      - ssh-keyscan
+      - -p
+      - "{{ ssh_port }}"
+      - -T
+      - "10"
+      - "{{ ssh_hostname }}"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  register: ssh_host_keys
+  failed_when: >-
+    (ssh_host_keys.stdout_lines | reject('match', '^(#|$)') | list | length) == 0
+
+- name: read stored host keys
+  ansible.builtin.command:
+    argv:
+      - ssh-keygen
+      - -F
+      - "{{ ssh_known_hosts_name }}"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+  failed_when: false
+  register: stored_host_keys
+
+- name: record host key lines
+  ansible.builtin.set_fact:
+    ssh_current_keys: "{{ ssh_host_keys.stdout_lines | reject('match', '^(#|$)') | list }}"
+    ssh_stored_keys: "{{ stored_host_keys.stdout_lines | reject('match', '^(#|$)') | list }}"
+  delegate_to: localhost
+
+- name: remove previous host key
+  ansible.builtin.known_hosts:
+    name: "{{ ssh_known_hosts_name }}"
+    state: absent
+  delegate_to: localhost
+  become: false
+  when: ssh_current_keys | sort != ssh_stored_keys | sort
+
+- name: store current host keys
+  ansible.builtin.known_hosts:
+    name: "{{ item.split()[0] }}"
+    key: "{{ item }}"
+    state: present
+  delegate_to: localhost
+  become: false
+  loop: "{{ ssh_current_keys }}"
+  when: ssh_current_keys | sort != ssh_stored_keys | sort
+
+- name: check connectivity
+  ansible.builtin.ping:

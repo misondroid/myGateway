@@ -1,3 +1,10 @@
+ROLE ?= check
+HOST ?= gateway
+CHECK ?= --check
+ifeq ($(APPLY), true)
+CHECK = 
+endif
+
 build:
 	docker compose build
 .PHONY: build
@@ -29,3 +36,7 @@ restore-rules:
 rules-check-venv:
 	@test -x .venv/bin/python || (echo "run: python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt" >&2; exit 1)
 .PHONY: rules-check-venv
+
+playbook:
+	ansible-playbook $(CHECK) -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml
+.PHONY: playbook

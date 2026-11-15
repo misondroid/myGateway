@@ -1,5 +1,6 @@
 services/*/data/
 data/
 .env
+.python-version
 .venv/
-services/host/nat.generated.rules
+services/host/nat.generated.rules'

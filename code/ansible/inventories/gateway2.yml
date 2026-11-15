@@ -1,0 +1,5 @@
+all:
+  hosts:
+    gateway2:
+      ansible_host: gateway2
+      hoge: fuga

@@ -1,0 +1,10 @@
+packages:
+  desktop:
+  - xfce4
+  - dbus-x11
+  - fonts-noto-cjk
+  - fcitx-mozc
+  - language-pack-ja
+  xrdp:
+  - xrdp
+  - xorgxrdp

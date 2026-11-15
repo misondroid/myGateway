@@ -1,0 +1,27 @@
+- name: update apt repositories
+  apt:
+    update_cache: true
+- name: upgrade apt packages
+  apt:
+    upgrade: true
+
+- name: install basic packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages.base }}"
+
+- name: check whether python3-pip is installed
+  command: dpkg-query -W -f '${Status}' python3-pip
+  register: python3_pip_status
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: install python packages via pip
+  pip:
+    name: "{{ item }}"
+    state: present
+    break_system_packages: true
+  loop: "{{ packages.pip }}"
+  when: python3_pip_status.stdout == 'install ok installed'
