@@ -11,6 +11,12 @@
     state: present
   loop: "{{ packages.base }}"
 
+- name: set IP fowarding enabled
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    state: present
+
 - name: check whether python3-pip is installed
   command: dpkg-query -W -f '${Status}' python3-pip
   register: python3_pip_status
@@ -25,3 +31,13 @@
     break_system_packages: true
   loop: "{{ packages.pip }}"
   when: python3_pip_status.stdout == 'install ok installed'
+
+- name: set timezone to JST
+  ansible.builtin.timezone:
+    name: Asia/Tokyo
+
+- name: set locale to ja_JP.UTF-8
+  community.general.locale_gen:
+    name: ja_JP.UTF-8
+    state: present
+

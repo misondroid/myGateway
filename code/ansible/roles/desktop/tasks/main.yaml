@@ -1,3 +1,17 @@
+- name: add helium repository public key
+  shell: |
+    install -d "$(dirname {{ helium.key | quote }})"
+    curl -fsSL {{ helium.pubkey | quote }} | gpg --batch --yes --dearmor -o {{ helium.key | quote }}
+    chmod 644 {{ helium.key | quote }}
+  register: helium_key_download
+
+- name: add helium repository
+  when: helium_key_download.changed
+  template:
+    src: helium.list
+    dest: "{{ helium.list }}"
+    mode: '0644'
+
 - name: update apt repositories
   apt:
     update_cache: true

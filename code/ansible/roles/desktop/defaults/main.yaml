@@ -5,6 +5,12 @@ packages:
   - fonts-noto-cjk
   - fcitx-mozc
   - language-pack-ja
+  - helium-bin
   xrdp:
   - xrdp
   - xorgxrdp
+helium:
+  repo: https://pkg.helium.computer/deb
+  pubkey: https://raw.githubusercontent.com/imputnet/helium-linux/main/pubkey.asc
+  list: /etc/apt/sources.list.d/helium.list
+  key: /usr/share/keyring/helium.gpg

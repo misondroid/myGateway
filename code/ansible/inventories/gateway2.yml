@@ -3,3 +3,6 @@ all:
     gateway2:
       ansible_host: gateway2
       hoge: fuga
+    vars:
+      ip_address: 192.168.1.253
+      nic_nane: 

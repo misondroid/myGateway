@@ -1,0 +1,1 @@
+deb [signed-by="{{ helium.key }}"] "{{ helium.repo }}" stable main
