@@ -1,0 +1,19 @@
+- name: prepare deployment directory
+  file:
+    path: "{{ app.dest }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ login_user }}"
+    group: "{{ login_user }}"
+
+- name: clone git repository
+  become: no
+  git:
+    repo: "{{ app.repo }}"
+    dest: "{{ app.dest }}"
+
+- name: build docker image
+  when: docker_available_to_user
+  shell: |
+    cd {{ app.dest }}
+    make build

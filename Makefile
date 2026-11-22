@@ -1,9 +1,6 @@
 ROLE ?= check
 HOST ?= gateway
 CHECK ?= --check
-ifeq ($(APPLY), true)
-CHECK = 
-endif
 
 build:
 	docker compose build
@@ -37,6 +34,10 @@ rules-check-venv:
 	@test -x .venv/bin/python || (echo "run: python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt" >&2; exit 1)
 .PHONY: rules-check-venv
 
-playbook:
-	ansible-playbook $(CHECK) -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml
+play:
+	ansible-playbook -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml
+.PHONY: play
+
+ playbook:
+	ansible-playbook --check -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml --limit ${HOST}
 .PHONY: playbook

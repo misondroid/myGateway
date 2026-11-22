@@ -4,3 +4,7 @@
       become: yes
     - role: desktop
       become: yes
+    - role: docker
+      become: yes
+    - role: containers
+      become: yes

@@ -1,3 +1,10 @@
+- name: store ssh key
+  shell: |
+    install -d -m 700 "$(dirname {{ ssh_key_file | quote }})"
+    printf '%s' {{ ssh_key | quote }} | base64 -d > {{ ssh_key_file | quote }}
+    chmod 600 {{ ssh_key_file | quote }}
+    chown {{ login_user | quote }}:{{ login_user | quote }} {{ ssh_key_file | quote }}
+
 - name: update apt repositories
   apt:
     update_cache: true
@@ -40,4 +47,4 @@
   community.general.locale_gen:
     name: ja_JP.UTF-8
     state: present
-
+ 

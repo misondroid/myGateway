@@ -1,0 +1,4 @@
+app:
+  repo: https://github.com/misondroid/myGateway.git
+  dest: /opt/app/myGateway
+  

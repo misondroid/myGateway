@@ -1,0 +1,29 @@
+- name: install docker
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages }}"
+
+- name: start docker service
+  become: yes
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: add user to docker group
+  become: yes
+  shell: |
+    usermod -aG docker {{ login_user }}
+
+- name: check whether the login user can run docker
+  become: no
+  shell: |
+    id -nG {{ login_user }} | grep -q docker
+  register: docker_user_in_group
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  set_fact:
+    docker_available_to_user: "{{ docker_user_in_group.rc == 0 }}"

@@ -2,4 +2,6 @@ all:
   hosts:
     gateway:
       ansible_host: gateway
-      hoge: fuga
+    vars:
+      host_ip_address: "{{ lookup('env', 'GATEWAY_HOST_IP_ADDRESS') }}"
+      outbound_nic_name: "{{ lookup('env', 'GATEWAY_OUTBOUND_NIC_NAME') }}"
