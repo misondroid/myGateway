@@ -1,7 +1,7 @@
 ROLE ?= check
 HOST ?= gateway
 CHECK ?= --check
-
+OPTIONS ?=
 build:
 	docker compose build
 .PHONY: build
@@ -35,9 +35,13 @@ rules-check-venv:
 .PHONY: rules-check-venv
 
 play:
-	ansible-playbook -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml
+	ansible-playbook ${OPTIONS} -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml
 .PHONY: play
 
  playbook:
-	ansible-playbook --check -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml --limit ${HOST}
+	ansible-playbook ${OPTIONS} --check -i code/ansible/inventories/${HOST}.yml code/ansible/roles/${HOST}.yml --limit ${HOST}
 .PHONY: playbook
+
+check-host:
+	ansible-playbook ${OPTIONS} -i code/ansible/inventories/${HOST}.yml code/ansible/roles/check.yml
+.PHONY: check-host

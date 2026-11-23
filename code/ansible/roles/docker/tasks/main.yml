@@ -19,11 +19,12 @@
 
 - name: check whether the login user can run docker
   become: no
-  shell: |
-    id -nG {{ login_user }} | grep -q docker
+  shell: id -nG {{ login_user | quote }} | grep -q -- docker
   register: docker_user_in_group
   changed_when: false
   failed_when: false
   check_mode: false
+
+- name: record whether the login user can run docker
   set_fact:
     docker_available_to_user: "{{ docker_user_in_group.rc == 0 }}"

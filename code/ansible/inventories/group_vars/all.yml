@@ -2,3 +2,7 @@
 ssh_key: "{{ lookup('env', 'SSH_KEY') }}"
 login_user: "{{ lookup('env', 'REMOTE_USER') }}"
 ssh_key_file: "/home/{{ login_user }}/.ssh/id_ed25519.github.com"
+
+sshd_config:
+  - PasswordAuthentication: "no"
+  - PermitRootLogin: "no"

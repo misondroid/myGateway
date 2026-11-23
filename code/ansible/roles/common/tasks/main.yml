@@ -43,8 +43,23 @@
   ansible.builtin.timezone:
     name: Asia/Tokyo
 
-- name: set locale to ja_JP.UTF-8
+- name: generate locale file for ja_JP.UTF-8
   community.general.locale_gen:
     name: ja_JP.UTF-8
     state: present
+
+- name: Set default system locale to ja_JP.UTF-8
+  ansible.builtin.lineinfile:
+    path: /etc/default/locale
+    regexp: '^LANG='
+    line: 'LANG=ja_JP.UTF-8'
  
+- name: secure SSH configuration
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^(#\\s*)?{{ item.key }}\\s+"
+    line: "{{ item.key }} {{ item.value }}"
+    state: present
+  loop: "{{ sshd_config | map('dict2items') | flatten }}"
+  notify: restart SSH service
+

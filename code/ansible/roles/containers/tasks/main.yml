@@ -13,7 +13,7 @@
     dest: "{{ app.dest }}"
 
 - name: build docker image
-  when: docker_available_to_user
+  when: docker_available_to_user | bool
   shell: |
     cd {{ app.dest }}
     make build
